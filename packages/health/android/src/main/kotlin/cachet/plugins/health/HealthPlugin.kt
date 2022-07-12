@@ -395,6 +395,8 @@ class HealthPlugin(private var channel: MethodChannel? = null) : MethodCallHandl
     }
 
     val type = call.argument<String>("activityType")!!
+    val activityName = call.argument<String>("activityName")!!
+    val activityDescription = call.argument<String>("activityDescription")!!
     val startTime = call.argument<Long>("startTime")!!
     val endTime = call.argument<Long>("endTime")!!
     val totalEnergyBurned = call.argument<Int>("totalEnergyBurned")
@@ -462,8 +464,8 @@ class HealthPlugin(private var channel: MethodChannel? = null) : MethodCallHandl
 
     // Finish session setup
     val session = Session.Builder()
-      .setName(activityType) // TODO: Make a sensible name / allow user to set name
-      .setDescription("")
+      .setName(activityName)
+      .setDescription(activityDescription)
       .setIdentifier(UUID.randomUUID().toString())
       .setActivity(activityType)
       .setStartTime(startTime, TimeUnit.MILLISECONDS)
