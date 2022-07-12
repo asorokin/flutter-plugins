@@ -33,9 +33,9 @@ import java.util.*
 import java.util.concurrent.*
 
 
-const val GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 1111
-const val CHANNEL_NAME = "flutter_health"
-const val MMOLL_2_MGDL = 18.0 // 1 mmoll= 18 mgdl
+const val MY_GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 1111
+const val MY_CHANNEL_NAME = "flutter_health"
+const val MY_MMOLL_2_MGDL = 18.0 // 1 mmoll= 18 mgdl
 
 class HealthPlugin(private var channel: MethodChannel? = null) : MethodCallHandler,
   ActivityResultListener, Result, ActivityAware, FlutterPlugin {
@@ -169,7 +169,7 @@ class HealthPlugin(private var channel: MethodChannel? = null) : MethodCallHandl
   )
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    channel = MethodChannel(flutterPluginBinding.binaryMessenger, CHANNEL_NAME)
+    channel = MethodChannel(flutterPluginBinding.binaryMessenger, MY_CHANNEL_NAME)
     channel?.setMethodCallHandler(this)
     threadPoolExecutor = Executors.newFixedThreadPool(4)
   }
@@ -194,7 +194,7 @@ class HealthPlugin(private var channel: MethodChannel? = null) : MethodCallHandl
     @Suppress("unused")
     @JvmStatic
     fun registerWith(registrar: Registrar) {
-      val channel = MethodChannel(registrar.messenger(), CHANNEL_NAME)
+      val channel = MethodChannel(registrar.messenger(), MY_CHANNEL_NAME)
       val plugin = HealthPlugin(channel)
       registrar.addActivityResultListener(plugin)
       channel.setMethodCallHandler(plugin)
@@ -238,7 +238,7 @@ class HealthPlugin(private var channel: MethodChannel? = null) : MethodCallHandl
 
 
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-    if (requestCode == GOOGLE_FIT_PERMISSIONS_REQUEST_CODE) {
+    if (requestCode == MY_GOOGLE_FIT_PERMISSIONS_REQUEST_CODE) {
       if (resultCode == Activity.RESULT_OK) {
         Log.d("FLUTTER_HEALTH", "Access Granted!")
         mResult?.success(true)
@@ -314,7 +314,7 @@ class HealthPlugin(private var channel: MethodChannel? = null) : MethodCallHandl
     // while mgdl is used for glucose in this plugin.
     val isGlucose = field == HealthFields.FIELD_BLOOD_GLUCOSE_LEVEL
     return when (value.format) {
-      Field.FORMAT_FLOAT -> if (!isGlucose) value.asFloat() else value.asFloat() * MMOLL_2_MGDL
+      Field.FORMAT_FLOAT -> if (!isGlucose) value.asFloat() else value.asFloat() * MY_MMOLL_2_MGDL
       Field.FORMAT_INT32 -> value.asInt()
       Field.FORMAT_STRING -> value.asString()
       else -> Log.e("Unsupported format:", value.format.toString())
@@ -358,7 +358,7 @@ class HealthPlugin(private var channel: MethodChannel? = null) : MethodCallHandl
     // while mgdl is used for glucose in this plugin.
     val isGlucose = field == HealthFields.FIELD_BLOOD_GLUCOSE_LEVEL
     val dataPoint = if (!isIntField(dataSource, field))
-      builder.setField(field, (if (!isGlucose) value else (value / MMOLL_2_MGDL).toFloat()))
+      builder.setField(field, (if (!isGlucose) value else (value / MY_MMOLL_2_MGDL).toFloat()))
         .build() else
       builder.setField(field, value.toInt()).build()
 
@@ -499,7 +499,7 @@ class HealthPlugin(private var channel: MethodChannel? = null) : MethodCallHandl
       if (!GoogleSignIn.hasPermissions(googleSignInAccount, fitnessOptions)) {
         GoogleSignIn.requestPermissions(
           activity!!,
-          GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
+          MY_GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
           googleSignInAccount,
           fitnessOptions
         )
@@ -588,7 +588,7 @@ class HealthPlugin(private var channel: MethodChannel? = null) : MethodCallHandl
           if (!GoogleSignIn.hasPermissions(googleSignInAccount, fitnessOptions)) {
             GoogleSignIn.requestPermissions(
               activity!!, // your activity
-              GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
+              MY_GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
               googleSignInAccount,
               fitnessOptions
             )
@@ -844,7 +844,7 @@ class HealthPlugin(private var channel: MethodChannel? = null) : MethodCallHandl
     if (!isGranted && activity != null) {
       GoogleSignIn.requestPermissions(
         activity!!,
-        GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
+        MY_GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
         GoogleSignIn.getLastSignedInAccount(activity!!),
         optionsToRegister
       )
